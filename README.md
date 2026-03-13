@@ -1,6 +1,14 @@
 # Tower Rush
 
-Przegladarkowa gra platformowa inspirowana `Icy Tower`, napisana w Phaserze.
+`Tower Rush` to przegladarkowa gra platformowa inspirowana `Icy Tower`, napisana w Phaserze. Wspinasz sie coraz wyzej po losowo generowanych platformach, unikasz spadku i reagujesz na zmieniajacy sie klimat oraz rosnacy poziom trudnosci.
+
+## Zagraj online
+
+Gra jest dostepna pod adresem:
+
+```text
+https://petitoff.github.io/tower-rush/
+```
 
 ## Uruchomienie
 
@@ -24,6 +32,10 @@ http://localhost:8080
 
 Na telefonie dostepne sa przyciski ekranowe.
 
+## Hosting
+
+Projekt jest hostowany statycznie przez `GitHub Pages`.
+
 ## Uwagi
 
-Projekt laduje Phaser z CDN `jsDelivr`, wiec do uruchomienia potrzebne jest polaczenie z internetem.
+Projekt laduje Phaser z CDN `jsDelivr`, wiec do uruchomienia i gry online potrzebne jest polaczenie z internetem.
