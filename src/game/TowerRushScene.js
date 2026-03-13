@@ -1,6 +1,7 @@
 import {
   BASE_GAME_WIDTH,
   FALL_LIMIT,
+  FX_TEXTURE_KEYS,
   GENERATION_BUFFER,
   HUD_TEXT_STYLE,
   LEVEL_THEMES,
@@ -71,6 +72,7 @@ export class TowerRushScene extends Phaser.Scene {
     this.player.setGravityY(1900);
     this.player.setMaxVelocity(440, 1400);
     this.player.setDragX(1400);
+    this.player.setDepth(12);
 
     this.physics.add.collider(
       this.player,
@@ -90,6 +92,7 @@ export class TowerRushScene extends Phaser.Scene {
 
     this.createHud();
     this.createGameOverPanel();
+    this.createPlayerEffects();
 
     this.input.on("pointerdown", () => {
       if (this.gameOver) {
@@ -169,6 +172,7 @@ export class TowerRushScene extends Phaser.Scene {
     }
 
     this.updatePlayerAppearance();
+    this.updatePlayerEffects(dt);
     this.updateCamera(dt);
     this.maintainPlatforms();
     this.updateCrumblingPlatforms(dt, onGround);
@@ -239,6 +243,20 @@ export class TowerRushScene extends Phaser.Scene {
     panelHint.setOrigin(0.5);
 
     this.gameOverPanel.add([panelBg, panelTitle, this.gameOverScore, panelHint]);
+  }
+
+  createPlayerEffects() {
+    this.boostFlame = this.add
+      .image(this.player.x, this.player.y, FX_TEXTURE_KEYS.flame)
+      .setDepth(10)
+      .setVisible(false)
+      .setAlpha(0);
+
+    this.boostBurst = this.add
+      .image(this.player.x, this.player.y, FX_TEXTURE_KEYS.burst)
+      .setDepth(11)
+      .setVisible(false)
+      .setAlpha(0);
   }
 
   createBackdrop() {
@@ -433,6 +451,9 @@ export class TowerRushScene extends Phaser.Scene {
   performJump() {
     const speedBonus = Phaser.Math.Clamp(this.runSpeed * 0.9, 0, 220);
     this.player.setVelocityY(-820 - speedBonus);
+    if (speedBonus > 90) {
+      this.playBoostBurst(0.55);
+    }
   }
 
   performWallJump() {
@@ -442,6 +463,7 @@ export class TowerRushScene extends Phaser.Scene {
     this.player.setVelocityX(this.wallJumpDirection * (390 + speedBonus));
     this.player.setVelocityY(-960 - speedBonus);
     this.currentStandingPlatform = null;
+    this.playBoostBurst(0.95);
     this.cameras.main.shake(110, 0.0028);
   }
 
@@ -498,6 +520,47 @@ export class TowerRushScene extends Phaser.Scene {
       this.player.setTint(nextTint);
       this.currentPlayerTint = nextTint;
     }
+  }
+
+  updatePlayerEffects(dt) {
+    const horizontalSpeed = Math.abs(this.player.body.velocity.x);
+    const speedBoost = Phaser.Math.Clamp((horizontalSpeed - 170) / 170, 0, 1);
+    const wallJumpBoost = Phaser.Math.Clamp(this.wallJumpLock / WALL_JUMP_LOCK, 0, 1);
+    const flameAlpha = Math.max(speedBoost * 0.6, wallJumpBoost * 0.75);
+
+    if (this.boostFlame) {
+      const offsetX = this.player.flipX ? 18 : -18;
+      this.boostFlame.setVisible(flameAlpha > 0.05);
+      this.boostFlame.setPosition(this.player.x + offsetX, this.player.y + 12);
+      this.boostFlame.setScale(0.65 + flameAlpha * 0.75);
+      this.boostFlame.setAlpha(flameAlpha * 0.85);
+      this.boostFlame.setAngle(this.player.flipX ? 30 : -30);
+    }
+  }
+
+  playBoostBurst(intensity = 1) {
+    if (!this.boostBurst) {
+      return;
+    }
+
+    const offsetX = this.player.flipX ? 22 : -22;
+    this.boostBurst.setVisible(true);
+    this.boostBurst.setPosition(this.player.x + offsetX, this.player.y + 8);
+    this.boostBurst.setScale(0.45 + intensity * 0.7);
+    this.boostBurst.setAlpha(0.65);
+    this.boostBurst.setAngle(this.player.flipX ? 25 : -25);
+
+    this.tweens.killTweensOf(this.boostBurst);
+    this.tweens.add({
+      targets: this.boostBurst,
+      alpha: 0,
+      scaleX: this.boostBurst.scaleX + 0.35,
+      scaleY: this.boostBurst.scaleY + 0.35,
+      duration: 120,
+      onComplete: () => {
+        this.boostBurst.setVisible(false);
+      },
+    });
   }
 
   updateCamera(dt) {

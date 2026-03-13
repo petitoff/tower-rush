@@ -21,6 +21,11 @@ export const PLAYER_TEXTURE_KEYS = {
   wall: "player-wall",
 };
 
+export const FX_TEXTURE_KEYS = {
+  flame: "fx-boost-flame",
+  burst: "fx-boost-burst",
+};
+
 export const PLATFORM_TEXTURE_KEYS = {
   solid: "platform",
   crackLight: "platform-crack-1",

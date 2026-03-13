@@ -1,4 +1,4 @@
-import { PLATFORM_TEXTURE_KEYS, PLAYER_POSES, PLAYER_TEXTURE_KEYS } from "./constants.js";
+import { FX_TEXTURE_KEYS, PLATFORM_TEXTURE_KEYS, PLAYER_POSES, PLAYER_TEXTURE_KEYS } from "./constants.js";
 
 export function ensurePlayerTextures(scene) {
   if (scene.textures.exists(PLAYER_TEXTURE_KEYS.idle)) {
@@ -17,6 +17,8 @@ export function ensurePlayerTextures(scene) {
   drawPlatformTexture(graphics, PLATFORM_TEXTURE_KEYS.crackLight, 1);
   drawPlatformTexture(graphics, PLATFORM_TEXTURE_KEYS.crackMedium, 2);
   drawPlatformTexture(graphics, PLATFORM_TEXTURE_KEYS.crackHeavy, 3);
+  drawFlameTexture(graphics, FX_TEXTURE_KEYS.flame);
+  drawBurstTexture(graphics, FX_TEXTURE_KEYS.burst);
   graphics.destroy();
 }
 
@@ -81,6 +83,32 @@ function strokeCrack(graphics, points) {
     graphics.lineTo(points[i][0], points[i][1]);
   }
   graphics.strokePath();
+}
+
+function drawFlameTexture(graphics, key) {
+  graphics.clear();
+  graphics.fillStyle(0xff8c42, 0.35);
+  graphics.fillCircle(16, 16, 13);
+  graphics.fillStyle(0xffa62b, 0.9);
+  graphics.fillTriangle(16, 0, 28, 22, 16, 28);
+  graphics.fillTriangle(16, 0, 4, 22, 16, 28);
+  graphics.fillStyle(0xffd166, 0.95);
+  graphics.fillTriangle(16, 5, 23, 20, 16, 24);
+  graphics.fillTriangle(16, 5, 9, 20, 16, 24);
+  graphics.fillStyle(0xfff5cc, 0.82);
+  graphics.fillCircle(16, 18, 5);
+  graphics.generateTexture(key, 32, 32);
+}
+
+function drawBurstTexture(graphics, key) {
+  graphics.clear();
+  graphics.lineStyle(4, 0xffd166, 0.5);
+  graphics.strokeCircle(22, 22, 14);
+  graphics.lineStyle(2, 0xfff5cc, 0.8);
+  graphics.strokeCircle(22, 22, 9);
+  graphics.fillStyle(0xff8c42, 0.3);
+  graphics.fillCircle(22, 22, 20);
+  graphics.generateTexture(key, 44, 44);
 }
 
 function drawPlayerTexture(graphics, key, pose) {
