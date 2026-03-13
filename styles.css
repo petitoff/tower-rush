@@ -1,0 +1,169 @@
+:root {
+  color-scheme: dark;
+  --bg-top: #081522;
+  --bg-bottom: #12304d;
+  --panel: rgba(5, 14, 25, 0.78);
+  --panel-border: rgba(180, 223, 255, 0.22);
+  --text: #f7fbff;
+  --muted: #b7d0e6;
+  --accent: #ffd166;
+  --accent-strong: #ef8a17;
+  --control: rgba(255, 255, 255, 0.14);
+  --control-border: rgba(255, 255, 255, 0.18);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(255, 209, 102, 0.14), transparent 26%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  color: var(--text);
+}
+
+body {
+  min-height: 100dvh;
+}
+
+.page-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(320px, 680px);
+  gap: 24px;
+  width: min(1200px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 20px 0 28px;
+  align-items: stretch;
+  min-height: calc(100dvh - 48px);
+}
+
+.info-panel,
+.game-shell {
+  backdrop-filter: blur(18px);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.info-panel {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  line-height: 0.92;
+}
+
+.lead {
+  margin: 18px 0 20px;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.tips {
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.tips p {
+  margin: 0;
+}
+
+.game-shell {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+}
+
+#game-root {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+#game-root canvas {
+  display: block;
+}
+
+.touch-controls {
+  position: absolute;
+  inset: auto 16px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(78px, 1fr));
+  gap: 12px;
+  pointer-events: none;
+}
+
+.touch-button {
+  pointer-events: auto;
+  min-height: 58px;
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--control);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.touch-button:active,
+.touch-button.is-active {
+  background: rgba(255, 209, 102, 0.28);
+  border-color: rgba(255, 209, 102, 0.4);
+}
+
+.touch-button--jump {
+  background:
+    linear-gradient(180deg, rgba(255, 209, 102, 0.32), rgba(239, 138, 23, 0.32));
+}
+
+@media (min-width: 961px) {
+  .touch-controls {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    width: min(720px, calc(100vw - 20px));
+    gap: 16px;
+    padding: 12px 0 20px;
+    min-height: calc(100dvh - 32px);
+  }
+
+  .info-panel {
+    padding: 22px;
+  }
+
+  .game-shell {
+    min-height: 320px;
+  }
+}

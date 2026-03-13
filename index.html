@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Tower Rush</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="info-panel">
+        <p class="eyebrow">Phaser Platformer</p>
+        <h1>Tower Rush</h1>
+        <p class="lead">
+          Wbijaj sie coraz wyzej, lap tempo i wykorzystuj szybki bieg do
+          mocniejszych skokow.
+        </p>
+        <div class="tips">
+          <p><strong>Cel:</strong> wspinaj sie po platformach i nie spadnij poza ekran.</p>
+          <p><strong>PC:</strong> A / D lub strzalki, skok spacją.</p>
+          <p><strong>Mobile:</strong> przytrzymaj przyciski na dole ekranu.</p>
+          <p><strong>Restart:</strong> klawisz R po przegranej.</p>
+        </div>
+      </aside>
+
+      <main class="game-shell">
+        <div id="game-root" aria-label="Gra Tower Rush"></div>
+
+        <div class="touch-controls" aria-label="Sterowanie dotykowe">
+          <button class="touch-button" id="left-button" type="button">LEFT</button>
+          <button class="touch-button touch-button--jump" id="jump-button" type="button">
+            JUMP
+          </button>
+          <button class="touch-button" id="right-button" type="button">RIGHT</button>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
