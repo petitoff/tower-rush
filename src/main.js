@@ -45,10 +45,10 @@ class TowerRushScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
     this.populateStartingPlatforms();
 
-    this.player = this.physics.add.sprite(this.scale.width / 2, START_Y - 110, "player");
+    this.player = this.physics.add.sprite(this.scale.width / 2, START_Y - 110, "player-idle");
     this.player.setCollideWorldBounds(true);
-    this.player.setSize(34, 58);
-    this.player.setOffset(7, 4);
+    this.player.setSize(30, 60);
+    this.player.setOffset(17, 14);
     this.player.setGravityY(1900);
     this.player.setMaxVelocity(440, 1400);
     this.player.setDragX(1400);
@@ -143,13 +143,13 @@ class TowerRushScene extends Phaser.Scene {
     const leftPressed = this.cursors.left.isDown || this.keys.leftAlt.isDown || touchState.left;
     const rightPressed =
       this.cursors.right.isDown || this.keys.rightAlt.isDown || touchState.right;
-    const jumpPressed =
-      Phaser.Input.Keyboard.JustDown(this.cursors.space) ||
-      Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
-      Phaser.Input.Keyboard.JustDown(this.keys.jumpAlt) ||
-      consumeTouchJump();
+    const jumpHeld =
+      this.cursors.space.isDown ||
+      this.cursors.up.isDown ||
+      this.keys.jumpAlt.isDown ||
+      touchState.jump;
 
-    if (jumpPressed) {
+    if (jumpHeld) {
       this.jumpBuffer = 0.16;
     } else {
       this.jumpBuffer = Math.max(0, this.jumpBuffer - dt);
@@ -189,12 +189,11 @@ class TowerRushScene extends Phaser.Scene {
       this.wallCoyoteTime = 0;
     }
 
-    if (!jumpPressed && this.player.body.velocity.y < -180) {
+    if (!jumpHeld && this.player.body.velocity.y < -180) {
       this.player.setVelocityY(this.player.body.velocity.y + 1200 * dt);
     }
 
-    this.player.setFlipX(this.player.body.velocity.x < -10);
-    this.updatePlayerTint();
+    this.updatePlayerAppearance();
     this.updateCamera();
     this.extendTower();
     this.cleanupPlatforms();
@@ -203,16 +202,62 @@ class TowerRushScene extends Phaser.Scene {
   }
 
   createTextures() {
-    if (!this.textures.exists("player")) {
+    if (!this.textures.exists("player-idle")) {
       const graphics = this.make.graphics({ x: 0, y: 0, add: false });
-      graphics.fillStyle(0xffd166, 1);
-      graphics.fillRoundedRect(0, 0, 48, 62, 12);
-      graphics.fillStyle(0x0d1b2a, 1);
-      graphics.fillRect(11, 14, 8, 8);
-      graphics.fillRect(29, 14, 8, 8);
-      graphics.fillRect(15, 38, 18, 7);
-      graphics.generateTexture("player", 48, 62);
-      graphics.clear();
+      this.drawPlayerTexture(graphics, "player-idle", {
+        armLeft: { x: 13, y: 36, w: 10, h: 20, angle: -12 },
+        armRight: { x: 41, y: 36, w: 10, h: 20, angle: 10 },
+        legLeft: { x: 23, y: 56, w: 10, h: 18, angle: 0 },
+        legRight: { x: 37, y: 56, w: 10, h: 18, angle: 0 },
+        bodyTilt: 0,
+        scarfTail: -5,
+        eyeOffsetY: 0,
+      });
+      this.drawPlayerTexture(graphics, "player-run-a", {
+        armLeft: { x: 14, y: 37, w: 10, h: 20, angle: -38 },
+        armRight: { x: 41, y: 35, w: 10, h: 20, angle: 28 },
+        legLeft: { x: 24, y: 58, w: 10, h: 18, angle: 26 },
+        legRight: { x: 37, y: 56, w: 10, h: 18, angle: -24 },
+        bodyTilt: -5,
+        scarfTail: -12,
+        eyeOffsetY: -1,
+      });
+      this.drawPlayerTexture(graphics, "player-run-b", {
+        armLeft: { x: 13, y: 35, w: 10, h: 20, angle: 24 },
+        armRight: { x: 42, y: 37, w: 10, h: 20, angle: -36 },
+        legLeft: { x: 24, y: 56, w: 10, h: 18, angle: -22 },
+        legRight: { x: 37, y: 58, w: 10, h: 18, angle: 26 },
+        bodyTilt: 5,
+        scarfTail: 8,
+        eyeOffsetY: 1,
+      });
+      this.drawPlayerTexture(graphics, "player-jump", {
+        armLeft: { x: 14, y: 31, w: 10, h: 20, angle: -58 },
+        armRight: { x: 41, y: 31, w: 10, h: 20, angle: 54 },
+        legLeft: { x: 25, y: 58, w: 10, h: 16, angle: -16 },
+        legRight: { x: 36, y: 58, w: 10, h: 16, angle: 16 },
+        bodyTilt: 0,
+        scarfTail: -16,
+        eyeOffsetY: -1,
+      });
+      this.drawPlayerTexture(graphics, "player-fall", {
+        armLeft: { x: 13, y: 39, w: 10, h: 20, angle: 26 },
+        armRight: { x: 41, y: 39, w: 10, h: 20, angle: -24 },
+        legLeft: { x: 24, y: 58, w: 10, h: 18, angle: 10 },
+        legRight: { x: 37, y: 58, w: 10, h: 18, angle: -10 },
+        bodyTilt: 0,
+        scarfTail: 10,
+        eyeOffsetY: 1,
+      });
+      this.drawPlayerTexture(graphics, "player-wall", {
+        armLeft: { x: 12, y: 35, w: 10, h: 20, angle: -72 },
+        armRight: { x: 42, y: 36, w: 10, h: 20, angle: 12 },
+        legLeft: { x: 24, y: 58, w: 10, h: 17, angle: -10 },
+        legRight: { x: 37, y: 58, w: 10, h: 17, angle: 28 },
+        bodyTilt: -8,
+        scarfTail: -9,
+        eyeOffsetY: 0,
+      });
 
       graphics.fillStyle(0xf4f7fb, 1);
       graphics.fillRoundedRect(0, 0, 160, 22, 11);
@@ -221,6 +266,92 @@ class TowerRushScene extends Phaser.Scene {
       graphics.generateTexture("platform", 160, 22);
       graphics.destroy();
     }
+  }
+
+  drawPlayerTexture(graphics, key, pose) {
+    graphics.clear();
+
+    const outline = 0x10263d;
+    const coat = 0x3aa7b4;
+    const coatShadow = 0x267c8d;
+    const scarf = 0xffd166;
+    const hair = 0x19324d;
+    const skin = 0xffd7b5;
+    const boot = 0xf25f5c;
+    const glove = 0xf7fbff;
+
+    const drawLimb = (x, y, w, h, angle, color) => {
+      graphics.save();
+      graphics.translateCanvas(x, y);
+      graphics.rotateCanvas(Phaser.Math.DegToRad(angle));
+      graphics.fillStyle(outline, 1);
+      graphics.fillRoundedRect(-w / 2 - 2, -h / 2 - 2, w + 4, h + 4, 6);
+      graphics.fillStyle(color, 1);
+      graphics.fillRoundedRect(-w / 2, -h / 2, w, h, 5);
+      graphics.restore();
+    };
+
+    graphics.fillStyle(outline, 0.2);
+    graphics.fillEllipse(32, 76, 26, 8);
+
+    drawLimb(pose.legLeft.x, pose.legLeft.y, pose.legLeft.w, pose.legLeft.h, pose.legLeft.angle, boot);
+    drawLimb(
+      pose.legRight.x,
+      pose.legRight.y,
+      pose.legRight.w,
+      pose.legRight.h,
+      pose.legRight.angle,
+      boot
+    );
+    drawLimb(pose.armLeft.x, pose.armLeft.y, pose.armLeft.w, pose.armLeft.h, pose.armLeft.angle, glove);
+    drawLimb(
+      pose.armRight.x,
+      pose.armRight.y,
+      pose.armRight.w,
+      pose.armRight.h,
+      pose.armRight.angle,
+      glove
+    );
+
+    graphics.save();
+    graphics.translateCanvas(32, 41);
+    graphics.rotateCanvas(Phaser.Math.DegToRad(pose.bodyTilt));
+
+    graphics.fillStyle(outline, 1);
+    graphics.fillRoundedRect(-16, -4, 32, 38, 12);
+    graphics.fillStyle(coat, 1);
+    graphics.fillRoundedRect(-14, -2, 28, 34, 11);
+    graphics.fillStyle(coatShadow, 1);
+    graphics.fillRoundedRect(-5, -2, 8, 34, 5);
+
+    graphics.fillStyle(scarf, 1);
+    graphics.fillRoundedRect(-15, -7, 30, 10, 5);
+    graphics.fillTriangle(10, -2, 18, pose.scarfTail, 4, 8);
+
+    graphics.fillStyle(outline, 1);
+    graphics.fillCircle(0, -17, 16);
+    graphics.fillStyle(skin, 1);
+    graphics.fillCircle(0, -18, 14);
+
+    graphics.fillStyle(hair, 1);
+    graphics.fillCircle(-2, -23, 13);
+    graphics.fillRoundedRect(-14, -31, 26, 10, 4);
+    graphics.fillTriangle(-14, -22, -2, -35, 8, -21);
+
+    graphics.fillStyle(0xffffff, 1);
+    graphics.fillCircle(-5, -19 + pose.eyeOffsetY, 2.6);
+    graphics.fillCircle(5, -19 + pose.eyeOffsetY, 2.6);
+    graphics.fillStyle(outline, 1);
+    graphics.fillCircle(-5, -19 + pose.eyeOffsetY, 1.1);
+    graphics.fillCircle(5, -19 + pose.eyeOffsetY, 1.1);
+    graphics.fillRoundedRect(-5, -12, 10, 3, 2);
+
+    graphics.fillStyle(0xffffff, 0.22);
+    graphics.fillRoundedRect(-10, 3, 9, 16, 4);
+
+    graphics.restore();
+
+    graphics.generateTexture(key, 64, 80);
   }
 
   createBackdrop() {
@@ -380,8 +511,27 @@ class TowerRushScene extends Phaser.Scene {
     return player.body.velocity.y >= -10 && player.body.bottom <= platform.body.top + 18;
   }
 
-  updatePlayerTint() {
+  updatePlayerAppearance() {
+    const onGround = this.player.body.blocked.down || this.player.body.touching.down;
+    const speed = Math.abs(this.player.body.velocity.x);
     const risingFast = this.player.body.velocity.y < -860;
+    let textureKey = "player-idle";
+
+    if (!onGround) {
+      if (this.wallCoyoteTime > 0 && this.player.body.velocity.y > 40) {
+        textureKey = "player-wall";
+      } else if (this.player.body.velocity.y < -120) {
+        textureKey = "player-jump";
+      } else {
+        textureKey = "player-fall";
+      }
+    } else if (speed > 120) {
+      textureKey = Math.floor(this.time.now / 90) % 2 === 0 ? "player-run-a" : "player-run-b";
+    }
+
+    this.player.setTexture(textureKey);
+    this.player.setFlipX(this.player.body.velocity.x < -10);
+    this.player.setAngle(Phaser.Math.Clamp(this.player.body.velocity.x * 0.035, -8, 8));
     this.player.setTint(risingFast ? 0xfff0ad : 0xffffff);
   }
 
@@ -455,14 +605,6 @@ class TowerRushScene extends Phaser.Scene {
   }
 }
 
-function consumeTouchJump() {
-  if (!touchState.jump) {
-    return false;
-  }
-  touchState.jump = false;
-  return true;
-}
-
 function wireTouchButton(buttonId, stateKey, consumeOnPress = false) {
   const button = document.getElementById(buttonId);
   if (!button) {
@@ -498,7 +640,7 @@ function wireTouchButton(buttonId, stateKey, consumeOnPress = false) {
 function createGame() {
   wireTouchButton("left-button", "left");
   wireTouchButton("right-button", "right");
-  wireTouchButton("jump-button", "jump", true);
+  wireTouchButton("jump-button", "jump");
 
   const root = document.getElementById("game-root");
   const width = Math.max(320, Math.round(root?.clientWidth || BASE_GAME_WIDTH));
